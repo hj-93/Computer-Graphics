@@ -17,7 +17,7 @@ SDL_Window* g_window = nullptr;
 // consists of positions (from positionBuffer) and color (from colorBuffer)
 // in this example.
 GLuint vertexArrayObject;
-
+GLuint vertexArrayObject2;
 // The shaderProgram combines a vertex shader (vertexShader) and a
 // fragment shader (fragmentShader) into a single GLSL program that can
 // be activated (glUseProgram()).
@@ -92,8 +92,44 @@ void initGL()
 	// TASK 4: Add two new triangles. First by creating another vertex array
 	//		   object, and then by adding a triangle to an existing VAO.
 	//////////////////////////////////////////////////////////////////////////////
+	const float positions2[] = {
+		//	 X      Y     Z
+		0.1f,  0.6f,  1.0f,  // v0
+		0.6f,  0.6f,  1.0f,  // v1
+		0.6f,  -0.6f, 1.0f,  // v2
 
+        0.1f,  0.65f,  1.0f,  // v0
+		-0.6f, 0.95f,  1.0f,  // v1
+		0.6f,  0.95f,  1.0f   // v2
+	};
+	GLuint positionBuffer2;
+	glGenBuffers(1, &positionBuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions2), positions2, GL_STATIC_DRAW);
 
+	const float colors2[] = {
+		//   R     G     B
+		0.968, 0.133, 0.133,
+		0.117, 0.768, 0.011,
+		0.768, 0.011, 0.678,
+
+		0.968, 0.133, 0.133,
+		0.117, 0.768, 0.011,
+		0.768, 0.011, 0.678,
+	};
+	GLuint colorBuffer2;
+	glGenBuffers(1, &colorBuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer2);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors2), colors2, GL_STATIC_DRAW);
+
+	glGenVertexArrays(2, &vertexArrayObject2);
+	glBindVertexArray(vertexArrayObject2);
+	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer2);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer2);
+	glVertexAttribPointer(1, 3, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+	glEnableVertexAttribArray(0); // Enable the vertex position attribute
+	glEnableVertexAttribArray(1); // Enable the vertex color attribute
 
 	///////////////////////////////////////////////////////////////////////////
 	// Create shaders
@@ -191,6 +227,12 @@ void display(void)
 	// Submit triangles from currently bound vertex array object.
 	glDrawArrays(GL_TRIANGLES, 0, 3); // Render 1 triangle
 
+    // // Render a second triangle
+	glBindVertexArray(vertexArrayObject);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glBindVertexArray(vertexArrayObject2);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	glUseProgram(0); // "unsets" the current shader program. Not really necessary.
 }
