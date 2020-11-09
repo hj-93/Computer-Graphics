@@ -7,9 +7,11 @@ precision highp float;
 // >>> @task 3.4
 
 layout(location = 0) out vec4 fragmentColor;
+in vec2 texCoord;
 
 void main()
 {
 	// >>> @task 3.5
-	fragmentColor = vec4(1.0, 0.5, 0.25, 1.0);
+	// fragmentColor = vec4(1.0, 0.5, 0.25, 1.0);
+	fragmentColor = vec4(texCoord.x, texCoord.y, 0.0, 0.0);
 }
