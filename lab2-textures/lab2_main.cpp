@@ -29,10 +29,10 @@ GLuint shaderProgram;
 
 // The vertexArrayObject here will hold the pointers to
 // the vertex data (in positionBuffer) and color data per vertex (in colorBuffer)
-GLuint positionBuffer, colorBuffer, textureBuffer, indexBuffer, vertexArrayObject, texture;
+GLuint positionBuffer[2], colorBuffer, textureBuffer[2], indexBuffer[2], vertexArrayObject[2], texture[2];
 
- const GLuint64EXT magOptions[] = { GL_NEAREST, GL_LINEAR };
- const GLuint64EXT miniOptions[] = { GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR };
+const GLuint64EXT magOptions[]  = { GL_NEAREST, GL_LINEAR };
+const GLuint64EXT miniOptions[] = { GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR };
 
 void initGL()
 {
@@ -40,9 +40,9 @@ void initGL()
 	// Create the vertex array object
 	///////////////////////////////////////////////////////////////////////////
 	// Create a handle for the vertex array object
-	glGenVertexArrays(1, &vertexArrayObject);
+	glGenVertexArrays(2, vertexArrayObject);
 	// Set it as current, i.e., related calls will affect this object
-	glBindVertexArray(vertexArrayObject);
+	glBindVertexArray(vertexArrayObject[0]);
 
 	///////////////////////////////////////////////////////////////////////////
 	// Create the positions buffer object
@@ -55,9 +55,9 @@ void initGL()
 		10.0f,  -5.0f,  -10.0f   // v3
 	};
 	// Create a handle for the vertex position buffer
-	glGenBuffers(1, &positionBuffer);
+	glGenBuffers(2, positionBuffer);
 	// Set the newly created buffer as the current one
-	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer[0]);
 	// Send the vetex position data to the current buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
@@ -71,14 +71,14 @@ void initGL()
 	//				 Enable the vertex attrib array.
 	///////////////////////////////////////////////////////////////////////////
 	float texcoords[] = {
-	0.0f, 0.0f,    // (u,v) for v0
-	0.0f, 15.0f,   // (u,v) for v1
-	1.0f, 15.0f,   // (u,v) for v2
-	1.0f, 0.0f     // (u,v) for v3
+		0.0f, 0.0f,    // (u,v) for v0
+		0.0f, 15.0f,   // (u,v) for v1
+		1.0f, 15.0f,   // (u,v) for v2
+		1.0f, 0.0f,    // (u,v) for v3
 	};
 
-	glGenBuffers(1, &textureBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+	glGenBuffers(2, textureBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, false/*normalized*/, 0/*stride*/, 0/*offset*/);
@@ -88,10 +88,10 @@ void initGL()
 	///////////////////////////////////////////////////////////////////////////
 	const int indices[] = {
 		0, 1, 3, // Triangle 1
-		1, 2, 3  // Triangle 2
+		1, 2, 3, // Triangle 2
 	};
-	glGenBuffers(1, &indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	glGenBuffers(2, indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
@@ -109,8 +109,50 @@ void initGL()
 	int w, h, comp;
 	unsigned char* image = stbi_load("../scenes/asphalt.jpg", &w, &h, &comp, STBI_rgb_alpha);
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glGenTextures(2, texture);
+
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	free(image);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
+	//************************************
+	//			Construct Explosion
+	//************************************
+	glBindVertexArray(vertexArrayObject[1]);
+	const float quadPositions[] = {
+		// X      Y       Z
+		-1, -1,  -10.0f,  // v0
+		-1,  1,  -10.0f,  // v1
+		1,   1,  -10.0f,  // v2
+		1,  -1,  -10.0f   // v3
+	};
+	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadPositions), quadPositions, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+	glEnableVertexAttribArray(0);
+
+	float quadTexcoords[] = {
+		0.0f, 0.0f,    // (u,v) for v0
+		0.0f, 1.0f,    // (u,v) for v1
+		1.0f, 1.0f,    // (u,v) for v2
+		1.0f, 0.0f     // (u,v) for v3
+	};
+
+	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadTexcoords), quadTexcoords, GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, false/*normalized*/, 0/*stride*/, 0/*offset*/);
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	image = stbi_load("../scenes/explosion.png", &w, &h, &comp, STBI_rgb_alpha);
+
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	free(image);
 
@@ -153,17 +195,24 @@ void display(void)
 	glUniform3f(loc, camera_pan, 0, 0);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magOptions[mag]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, miniOptions[mini]);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
 
 	// >>> @task 3.1
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glBindVertexArray(vertexArrayObject);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBindVertexArray(vertexArrayObject[0]);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+	//// Draw explosion
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
+	glBindVertexArray(vertexArrayObject[1]);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glUseProgram(0); // "unsets" the current shader program. Not really necessary.
 }
