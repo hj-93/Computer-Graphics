@@ -50,7 +50,10 @@ bool showUI = false;
 Model* cityModel = nullptr;
 Model* carModel = nullptr;
 Model* groundModel = nullptr;
-mat4 carModelMatrix(1.0f);
+mat4 carModelMatrix(1, -0, 0, 0, 
+	                0,  1, 0, 0, 
+	               -0, -0, 1, 0,
+	                0, -0, 5, 1);
 
 vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
 
@@ -136,6 +139,7 @@ void display()
 	//drawGround(modelViewProjectionMatrix);
 
 	// car
+	carModelMatrix = T;
 	modelViewProjectionMatrix = projectionMatrix * viewMatrix * carModelMatrix;
 	glUniformMatrix4fv(loc, 1, false, &modelViewProjectionMatrix[0].x);
 	render(carModel);
@@ -253,22 +257,26 @@ int main(int argc, char* argv[])
 
 		// check keyboard state (which keys are still pressed)
 		const uint8_t* state = SDL_GetKeyboardState(nullptr);
-
+		const float speed = 0.3f;
 		// implement camera controls based on key states
 		if(state[SDL_SCANCODE_UP])
 		{
+			T[3] += speed * deltaTime * vec4(0.0f, 0.0f, 1.0f, 0.0f);
 			printf("Key Up is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_DOWN])
 		{
+			T[3] -= speed * deltaTime * vec4(0.0f, 0.0f, 1.0f, 0.0f);
 			printf("Key Down is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_LEFT])
 		{
+			T[3] += speed * deltaTime * vec4(1.0f, 0.0f, 0.0f, 0.0f);
 			printf("Key Left is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_RIGHT])
 		{
+			T[3] -= speed * deltaTime * vec4(1.0f, 0.0f, 0.0f, 0.0f);
 			printf("Key Right is pressed down\n");
 		}
 	}
