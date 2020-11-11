@@ -153,8 +153,8 @@ void display()
 	render(cityModel);
 
 	// Ground
-	// Task 5: Uncomment this
-	//drawGround(modelViewProjectionMatrix);
+	// Task 5
+	drawGround(modelViewProjectionMatrix);
 
 	// car
 	carModelMatrix = R * T;
