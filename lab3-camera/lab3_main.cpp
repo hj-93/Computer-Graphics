@@ -50,17 +50,28 @@ bool showUI = false;
 Model* cityModel = nullptr;
 Model* carModel = nullptr;
 Model* groundModel = nullptr;
-mat4 carModelMatrix(1, -0, 0, 0, 
-	                0,  1, 0, 0, 
-	               -0, -0, 1, 0,
-	                0, -0, 5, 1);
+mat4 carModelMatrix(1, -0, 0, 0,
+					0,  1, 0, 0,
+				   -0, -0, 1, 0,
+					0, -0, 5, 1);
+
+mat4 carModelMatrix2(1, -0, 0, 0,
+	                 0,  1, 0, 0, 
+	                -0, -0, 1, 0,
+	                 2, -0, 5, 1);
 
 vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
 
 // Camera parameters
 vec3 cameraPosition(15.0f, 15.0f, 15.0f);
 vec3 cameraDirection(-1.0f, -1.0f, -1.0f);
-mat4 T(1.0f), R(1.0f);
+mat4 T(1.0f), R(1.0f), TT(1.0f), RR(1.0f);
+
+// Vehicle speed
+const float speed = 0.3f;
+const float rotateSpeed = 2.f;
+const float rotateSpeed2 = 0.75f;
+const float speed2 = 5.0f;
 
 void loadModels()
 {
@@ -144,6 +155,11 @@ void display()
 	glUniformMatrix4fv(loc, 1, false, &modelViewProjectionMatrix[0].x);
 	render(carModel);
 
+	carModelMatrix2 = glm::rotate(glm::mat4(1.f), rotateSpeed2 * deltaTime, glm::vec3(0.0f, -1.0f, 0.0f)) *
+					  glm::translate(glm::mat4(1.f), speed2 * deltaTime * glm::vec3(0.0f, 0.0f, 1.0f)) * carModelMatrix2;
+	modelViewProjectionMatrix = projectionMatrix * viewMatrix * carModelMatrix2;
+	glUniformMatrix4fv(loc, 1, false, &modelViewProjectionMatrix[0].x);
+	render(carModel);
 
 	glUseProgram(0);
 }
@@ -257,8 +273,7 @@ int main(int argc, char* argv[])
 
 		// check keyboard state (which keys are still pressed)
 		const uint8_t* state = SDL_GetKeyboardState(nullptr);
-		const float speed = 0.3f;
-		const float rotateSpeed = 2.f;
+
 		// implement camera controls based on key states
 		if(state[SDL_SCANCODE_UP])
 		{
