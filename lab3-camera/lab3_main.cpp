@@ -139,7 +139,7 @@ void display()
 	//drawGround(modelViewProjectionMatrix);
 
 	// car
-	carModelMatrix = T;
+	carModelMatrix = R * T;
 	modelViewProjectionMatrix = projectionMatrix * viewMatrix * carModelMatrix;
 	glUniformMatrix4fv(loc, 1, false, &modelViewProjectionMatrix[0].x);
 	render(carModel);
@@ -258,6 +258,7 @@ int main(int argc, char* argv[])
 		// check keyboard state (which keys are still pressed)
 		const uint8_t* state = SDL_GetKeyboardState(nullptr);
 		const float speed = 0.3f;
+		const float rotateSpeed = 2.f;
 		// implement camera controls based on key states
 		if(state[SDL_SCANCODE_UP])
 		{
@@ -272,13 +273,17 @@ int main(int argc, char* argv[])
 		if(state[SDL_SCANCODE_LEFT])
 		{
 			T[3] += speed * deltaTime * vec4(1.0f, 0.0f, 0.0f, 0.0f);
+			R[0] -= rotateSpeed * deltaTime * R[2];
 			printf("Key Left is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_RIGHT])
 		{
 			T[3] -= speed * deltaTime * vec4(1.0f, 0.0f, 0.0f, 0.0f);
+			R[0] += rotateSpeed * deltaTime * R[2];
 			printf("Key Right is pressed down\n");
 		}
+		R[0] = normalize(R[0]);
+		R[2] = vec4(cross(vec3(R[0]), vec3(R[1])), 0.0f);
 	}
 
 	// Shut down everything. This includes the window and all other subsystems.
