@@ -69,7 +69,7 @@ mat4 T(1.0f), R(1.0f), TT(1.0f), RR(1.0f);
 const float cameraSpeed = 5.0f;
 
 // Vehicle speed
-const float speed = 0.3f;
+const float speed = 2.0f;
 const float rotateSpeed = 2.f;
 const float rotateSpeed2 = 0.75f;
 const float speed2 = 5.0f;
@@ -157,13 +157,14 @@ void display()
 	drawGround(modelViewProjectionMatrix);
 
 	// car
-	carModelMatrix = R * T;
+	carModelMatrix = T * R;
 	modelViewProjectionMatrix = projectionMatrix * viewMatrix * carModelMatrix;
 	glUniformMatrix4fv(loc, 1, false, &modelViewProjectionMatrix[0].x);
 	render(carModel);
 
-	carModelMatrix2 = glm::rotate(glm::mat4(1.f), rotateSpeed2 * deltaTime, glm::vec3(0.0f, -1.0f, 0.0f)) *
-					  glm::translate(glm::mat4(1.f), speed2 * deltaTime * glm::vec3(0.0f, 0.0f, 1.0f)) * carModelMatrix2;
+	carModelMatrix2 = glm::rotate(rotateSpeed2 * currentTime, glm::vec3(0.0f, -1.0f, 0.0f)) *
+					  glm::translate(glm::vec3(8.0f, 0.0f, .0f));
+
 	modelViewProjectionMatrix = projectionMatrix * viewMatrix * carModelMatrix2;
 	glUniformMatrix4fv(loc, 1, false, &modelViewProjectionMatrix[0].x);
 	render(carModel);
@@ -286,23 +287,21 @@ int main(int argc, char* argv[])
 		// implement camera controls based on key states
 		if(state[SDL_SCANCODE_UP])
 		{
-			T[3] += speed * deltaTime * vec4(0.0f, 0.0f, 1.0f, 0.0f);
+			T[3] += speed * deltaTime * normalize(R * vec4(0.0f, 0.0f, 1.0f, 0.0f));
 			printf("Key Up is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_DOWN])
 		{
-			T[3] -= speed * deltaTime * vec4(0.0f, 0.0f, 1.0f, 0.0f);
+			T[3] -= speed * deltaTime * normalize(R * vec4(0.0f, 0.0f, 1.0f, 0.0f));
 			printf("Key Down is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_LEFT])
 		{
-			T[3] += speed * deltaTime * vec4(1.0f, 0.0f, 0.0f, 0.0f);
 			R[0] -= rotateSpeed * deltaTime * R[2];
 			printf("Key Left is pressed down\n");
 		}
 		if(state[SDL_SCANCODE_RIGHT])
 		{
-			T[3] -= speed * deltaTime * vec4(1.0f, 0.0f, 0.0f, 0.0f);
 			R[0] += rotateSpeed * deltaTime * R[2];
 			printf("Key Right is pressed down\n");
 		}

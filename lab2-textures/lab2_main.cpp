@@ -196,10 +196,6 @@ void display(void)
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magOptions[mag]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, miniOptions[mini]);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
-
 	// >>> @task 3.1
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -214,6 +210,7 @@ void display(void)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glUseProgram(0); // "unsets" the current shader program. Not really necessary.
 }
 
@@ -246,7 +243,9 @@ void gui()
 	            ImGui::GetIO().Framerate);
 	// ----------------------------------------------------------
 
-
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magOptions[mag]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, miniOptions[mini]);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
 	// Render the GUI.
 	ImGui::Render();
 }
