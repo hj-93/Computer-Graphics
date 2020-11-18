@@ -51,7 +51,7 @@ vec3 toSepiaTone(vec3 rgbSample);
 
 void main()
 {
-	switch(currentEffect)
+	switch(3)
 	{
 	case 0:
 		fragmentColor = textureRect(frameBufferTexture, gl_FragCoord.xy);
