@@ -324,8 +324,13 @@ void display()
 	// draw scene from security camera
 	///////////////////////////////////////////////////////////////////////////
 	// >>> @task 2
-	// ...
+	FboInfo& securityFB = fboList[0];
+	glBindFramebuffer(GL_FRAMEBUFFER, securityFB.framebufferId);
 
+	glViewport(0, 0, securityFB.width, securityFB.height);
+	glClearColor(0.2, 0.2, 0.8, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	drawScene(securityCamViewMatrix, securityCamProjectionMatrix);
 	///////////////////////////////////////////////////////////////////////////
 	// draw scene from camera
 	///////////////////////////////////////////////////////////////////////////
@@ -334,11 +339,13 @@ void display()
 	glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	labhelper::Material& screen = landingpadModel->m_materials[8];
+	screen.m_emission_texture.gl_id = securityFB.colorTextureTarget;
+
 	drawScene(viewMatrix, projectionMatrix); // using both shaderProgram and backgroundProgram
 
 	// camera (obj-model)
 	drawCamera(securityCamViewMatrix, viewMatrix, projectionMatrix);
-
 	///////////////////////////////////////////////////////////////////////////
 	// Post processing pass(es)
 	///////////////////////////////////////////////////////////////////////////
