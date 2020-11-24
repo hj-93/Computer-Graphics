@@ -247,10 +247,21 @@ void display(void)
 	// Set up shadow map parameters
 	///////////////////////////////////////////////////////////////////////////
 	// >>> @task 1
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFB.framebufferId);
+	if (shadowMapFB.width != shadowMapResolution || shadowMapFB.height != shadowMapResolution) {
+		shadowMapFB.resize(shadowMapResolution, shadowMapResolution);
+	}
+	glViewport(0, 0, shadowMapFB.width, shadowMapFB.height);
+	glClearColor(0.2, 0.2, 0.8, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	///////////////////////////////////////////////////////////////////////////
 	// Draw Shadow Map
 	///////////////////////////////////////////////////////////////////////////
+	drawScene(simpleShaderProgram, lightViewMatrix, lightProjMatrix, lightViewMatrix, lightProjMatrix);
+
+	labhelper::Material& screen = landingpadModel->m_materials[8];
+	screen.m_emission_texture.gl_id = shadowMapFB.colorTextureTarget;
 
 	///////////////////////////////////////////////////////////////////////////
 	// Draw from camera
@@ -263,7 +274,6 @@ void display(void)
 	drawBackground(viewMatrix, projMatrix);
 	drawScene(shaderProgram, viewMatrix, projMatrix, lightViewMatrix, lightProjMatrix);
 	debugDrawLight(viewMatrix, projMatrix, vec3(lightPosition));
-
 
 	CHECK_GL_ERROR();
 }
