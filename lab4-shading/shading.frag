@@ -125,10 +125,10 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 	vec4 pixel_world_pos = viewInverse * vec4(texCoord * 2.0 - 1.0, 1.0, 1.0);
 	pixel_world_pos = (1.0 / pixel_world_pos.w) * pixel_world_pos;
 
-	vec3 camera_pos = vec3(viewInverse * vec4(0.0));
+	// vec3 camera_pos = vec3(viewInverse * vec4(0.0));
 
     // Calculate the world-space direction from the camera to that position
-	vec3 dir = normalize(pixel_world_pos.xyz - camera_pos);
+	vec3 dir = normalize(nws);
 
 	float theta = acos(max(-1.0f, min(1.0f, dir.y)));
 	float phi = atan(dir.z, dir.x);
@@ -141,13 +141,13 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 	vec4 irradiance = environment_multiplier * texture(irradianceMap, lookup);
 	vec4 diffuse_term = vec4 (material_color, 0) * (1.0 / PI) * irradiance;
 
-	//return vec3(diffuse_term);
+	// return vec3(diffuse_term);
 	///////////////////////////////////////////////////////////////////////////
 	// Task 6 - Look up in the reflection map from the perfect specular
 	//          direction and calculate the dielectric and metal terms.
 	///////////////////////////////////////////////////////////////////////////
 
-	vec3 wi = normalize(reflect(wo, n));
+	vec3 wi = normalize(reflect(-wo, n));
 
 	dir = normalize(vec3(viewInverse * vec4(wi, 0.0f)));
 
@@ -173,7 +173,7 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 	float R0 = material_fresnel;
 	float Fwi = R0 + (1.0 - R0) * pow((1.0 - dot_wh_wi), 5.0);
 
-	vec3 dielectric_term = Fwi * Li * (1 - Fwi) * vec3(diffuse_term);
+	vec3 dielectric_term = Fwi * Li + (1 - Fwi) * vec3(diffuse_term);
 	vec3 metal_term = Fwi * material_color * Li;
 
 	float m = material_metalness;
@@ -183,14 +183,13 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 	return indirect_illum = r * microfacet_term + (1 - r) * vec3(diffuse_term);	
 }
 
-
 void main()
 {
 	///////////////////////////////////////////////////////////////////////////
 	// Task 1.1 - Fill in the outgoing direction, wo, and the normal, n. Both
 	//            shall be normalized vectors in view-space.
 	///////////////////////////////////////////////////////////////////////////
-	vec3 wo = normalize(vec3(0.0) - viewSpacePosition);
+	vec3 wo = -normalize(viewSpacePosition);
 	vec3 n = normalize(viewSpaceNormal);
 
 	vec3 base_color = material_color;
