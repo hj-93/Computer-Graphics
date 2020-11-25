@@ -60,6 +60,9 @@ uniform mat4 lightMatrix;
 in vec4 shadowMapCoord;
 layout(binding = 10) uniform sampler2D shadowMapTex;
 
+uniform vec3 viewSpaceLightDir;
+uniform float spotOuterAngle;
+uniform float spotInnerAngle;
 
 vec3 calculateDirectIllumiunation(vec3 wo, vec3 n)
 {
@@ -193,6 +196,14 @@ void main()
 	vec4 shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.f);
 	float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
     float visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
+
+	vec3 posToLight = normalize(viewSpaceLightPosition - viewSpacePosition);
+	float cosAngle = dot(posToLight, -viewSpaceLightDir);
+
+	// Spotlight with hard border:
+	//float spotAttenuation = (cosAngle > spotOuterAngle) ? 1.0 : 0.0;
+	float spotAttenuation = smoothstep(spotOuterAngle, spotInnerAngle, cosAngle);
+    visibility *= spotAttenuation;
 
 	float attenuation = 1.0;
 
