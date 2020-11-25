@@ -193,7 +193,6 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n)
 
 void main()
 {
-	vec4 shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.f);
 	float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
     float visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
 
