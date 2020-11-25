@@ -53,6 +53,12 @@ uniform vec3 viewSpaceLightPosition;
 ///////////////////////////////////////////////////////////////////////////////
 layout(location = 0) out vec4 fragmentColor;
 
+///////////////////////////////////////////////////////////////////////////////
+// shadow map
+///////////////////////////////////////////////////////////////////////////////
+uniform mat4 lightMatrix;
+in vec4 shadowMapCoord;
+layout(binding = 10) uniform sampler2D shadowMapTex;
 
 
 vec3 calculateDirectIllumiunation(vec3 wo, vec3 n)
@@ -184,7 +190,10 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n)
 
 void main()
 {
-	float visibility = 1.0;
+	vec4 shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.f);
+	float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
+    float visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
+
 	float attenuation = 1.0;
 
 
