@@ -271,6 +271,7 @@ void display(void)
 		vec4 border(shadowMapClampBorderShadowed ? 0.f : 1.f);
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &border.x);
 	}
+
 	glViewport(0, 0, shadowMapFB.width, shadowMapFB.height);
 	glClearColor(0.2, 0.2, 0.8, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
